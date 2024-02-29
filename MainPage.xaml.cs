@@ -26,19 +26,33 @@ namespace RysowanieKB2202
             float line2EndX = Line1EndX + Line2Length * (float)Math.Cos(angleRadians);
             float line2EndY = Line1EndY + Line2Length * (float)Math.Sin(angleRadians);
 
+
             canvas.StrokeColor = Colors.Green;
 
             canvas.DrawLine(Line1EndX, Line1EndY, line2EndX, line2EndY);
+
+            float staticAngle = 200;
+
+
+            float randomAngle = (float)((staticAngle - 90 - (360 - Line2AngleDegrees)) * Math.PI / 180.0);
+            float line3EndX = Line1EndX + Line2Length * (float)Math.Cos(randomAngle);
+            float line3EndY = Line1EndY + Line2Length * (float)Math.Sin(randomAngle);
+
+            canvas.StrokeColor = Colors.LightBlue;
+
+            canvas.DrawLine(Line1EndX, Line1EndY, line3EndX, line3EndY);
         }
     }
 
     public partial class MainPage : ContentPage
     {
         GraphicsDrawable drawable;
+        double compassAngle = 0; 
 
         public MainPage()
         {
             InitializeComponent();
+            ToggleCompass();
 
             drawable = new GraphicsDrawable
             {
@@ -52,11 +66,29 @@ namespace RysowanieKB2202
             grafika.Drawable = drawable;
         }
 
-        private void OnBtnClicked(object sender, EventArgs e)
+        private void ToggleCompass()
         {
-            float angle = Convert.ToSingle(angleEntry.Text);
-            drawable.Line2AngleDegrees = angle;
+            if (Compass.Default.IsSupported)
+            {
+                if (!Compass.Default.IsMonitoring)
+                {
+                    Compass.Default.ReadingChanged += Compass_ReadingChanged;
+                    Compass.Default.Start(SensorSpeed.UI);
+                }
+                else
+                {
+                    Compass.Default.Stop();
+                    Compass.Default.ReadingChanged -= Compass_ReadingChanged;
+                }
+            }
+        }
 
+        private void Compass_ReadingChanged(object sender, CompassChangedEventArgs e)
+        {
+            CompassLabel.TextColor = Colors.Green;
+            CompassLabel.Text = e.Reading.HeadingMagneticNorth+"";
+            compassAngle = e.Reading.HeadingMagneticNorth;
+            drawable.Line2AngleDegrees = (float)compassAngle;
             grafika.Invalidate();
         }
     }

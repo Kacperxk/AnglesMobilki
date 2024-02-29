@@ -8,19 +8,14 @@
             Padding="30,0"
             VerticalOptions="Center">
 
-            <Entry
-                x:Name="angleEntry"/>
             <GraphicsView x:Name="grafika"
                       HeightRequest="200"
                       WidthRequest="300"
                           />
-            
-            <Button
-                Margin="0,200,0,0"
-                x:Name="CounterBtn"
-                Text="Click me"
-                Clicked="OnBtnClicked"
-                HorizontalOptions="Center" />
+
+            <Label
+                x:Name="CompassLabel"
+                Text="HALO"/>
 
         </VerticalStackLayout>
     </ScrollView>
