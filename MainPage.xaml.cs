@@ -1,6 +1,8 @@
 ﻿using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Graphics.Platform;
 using System;
+using System.Reflection;
 
 namespace RysowanieKB2202
 {
@@ -16,6 +18,57 @@ namespace RysowanieKB2202
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
+
+            Microsoft.Maui.Graphics.IImage image;
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            string resourceName = "RysowanieKB2202.Resources.Images.compass.png";
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream != null)
+                {
+                    try
+                    {
+                        image = PlatformImage.FromStream(stream);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error loading image: {ex.Message}");
+                        image = null;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Resource {resourceName} not found.");
+                    image = null;
+                }
+            }
+
+            Console.WriteLine(image);
+
+            if (image != null)
+            {
+                // Draw the image with rotation based on wind direction
+                float windDirectionDegrees = 45; // Example wind direction (replace with actual wind direction)
+
+                // Calculate rotation angle in radians
+                float rotationRadians = (float)(windDirectionDegrees * Math.PI / 180);
+
+                // Save the current state of the canvas
+                canvas.SaveState();
+
+                // Translate canvas to center of the image
+                canvas.Translate(150, 150);
+
+                // Apply rotation transformation
+                canvas.Rotate(rotationRadians);
+
+                // Draw the image at the center (0, 0) with size 300x300
+                canvas.DrawImage(image, -150, -150, 300, 300);
+
+                // Restore canvas state
+                canvas.RestoreState();
+            }
             canvas.StrokeColor = Colors.Red;
             canvas.StrokeSize = 5;
 
